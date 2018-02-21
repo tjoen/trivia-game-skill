@@ -107,30 +107,18 @@ class LsttSkill(MycroftSkill):
             return 'invalid'
 
     def say(self, text):
-        self.wsnotify('recognizer_loop:audio_output_start')
+        self.emit('recognizer_loop:audio_output_start')
         cmd = ['mimic','--setf','int_f0_target_mean=107','--setf' 'duration_stretch=0.83','-t']
         cmd.append(text)
         p = Popen(cmd)
 	p.wait()
-        self.wsnotify('recognizer_loop:audio_output_end')
+        self.emit('recognizer_loop:audio_output_end')
 
     def playsmpl(self, filename):
-        self.wsnotify('recognizer_loop:audio_output_start')
+        self.emit('recognizer_loop:audio_output_start')
         cmd = ['aplay', str(filename)]
 	p = Popen(cmd)
-        self.wsnotify('recognizer_loop:audio_output_end')
-
-    def wsnotify(self, msg):
-        uri = 'ws://localhost:8181/core'
-        ws = create_connection(uri)
-        print "Sending " + msg + " to " + uri + "..."
-        data = "{}"
-        message = '{"type": "' + msg + '", "data": ' + data +'}'
-        result = ws.send(message)
-        print "Receiving..."
-        result =  ws.recv()
-        print "Received '%s'" % result
-        ws.close()
+        self.emit('recognizer_loop:audio_output_end')
 
     def handle_record_begin(self):
         LOGGER.info("Lsst - Begin Recording...") 
@@ -141,11 +129,11 @@ class LsttSkill(MycroftSkill):
                 config.get('sounds').get('start_listening'))
             if file:
                 self.playsmpl(file)
-        self.wsnotify('recognizer_loop:record_begin')
+        self.emit('recognizer_loop:record_begin')
 
     def handle_record_end(self):
         LOGGER.info("Lsst - End Recording...")
-        self.wsnotify('recognizer_loop:record_end')
+        self.emit('recognizer_loop:record_end')
 
     def runpocketsphinx(self, msg, speakchoice, arr):
         self.enclosure.mouth_text( ' | '.join(arr) )
