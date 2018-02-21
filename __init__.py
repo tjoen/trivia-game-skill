@@ -13,6 +13,8 @@ import json
 import random
 import time
 
+# @JarbasAI local listener
+import local-stt.py
 
 __author__ = 'tjoen'
 
@@ -23,21 +25,8 @@ yesno = [ 'yes', 'no']
 score = 0
 right = ['Right!', 'That is correct', 'Yes, you are right', 'That is the right answer', 'Yes, good answer', 'Excellent choice']
 wrong = ['That is incorrect', 'Wrong answer', 'Sorry, you are wrong', 'That is not the right answer', 'You are wrong']
-
 config = ConfigurationManager.get()
-ERROR_HANDLER_FUNC = CFUNCTYPE(None, c_char_p, c_int, c_char_p, c_int, c_char_p)
 
-def py_error_handler(filename, line, function, err, fmt):
-    pass
-
-c_error_handler = ERROR_HANDLER_FUNC(py_error_handler)
-
-@contextmanager
-def noalsaerr():
-    asound = cdll.LoadLibrary('libasound.so')
-    asound.snd_lib_error_set_handler(c_error_handler)
-    yield
-    asound.snd_lib_error_set_handler(None)
 
 class LsttSkill(MycroftSkill):
     def __init__(self):
@@ -134,64 +123,6 @@ class LsttSkill(MycroftSkill):
     def handle_record_end(self):
         LOGGER.info("Lsst - End Recording...")
         self.emit('recognizer_loop:record_end')
-
-    def runpocketsphinx(self, msg, speakchoice, arr):
-        self.enclosure.mouth_text( ' | '.join(arr) )
-        self.say(msg)
-        HOMEDIR = self.settings.get('resdir')
-        config = Decoder.default_config()
-        config.set_string('-hmm', self.settings.get('hmm'))
-        config.set_string('-lm', path.join(HOMEDIR, 'localstt.lm'))
-        config.set_string('-dict', path.join(HOMEDIR, 'localstt.dic'))
-        config.set_string('-logfn', '/dev/null')
-        decoder = Decoder(config)
-
-        with noalsaerr():
-            p = pyaudio.PyAudio()
-        stream = p.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=1024)
-        stream.start_stream()
-        self.handle_record_begin()
-      
-        in_speech_bf = False
-        decoder.start_utt()
-        while True:
-            buf = stream.read(1024)
-            if buf:
-                decoder.process_raw(buf, False, False)
-                if decoder.get_in_speech() != in_speech_bf:
-                    in_speech_bf = decoder.get_in_speech()
-                    if not in_speech_bf:
-                        decoder.end_utt()
-                        #print 'Result:', decoder.hyp().hypstr
-                        utt = decoder.hyp().hypstr
-                        decoder.start_utt()
-                        if utt.strip() != '':
-                            self.handle_record_end()
-                            stream.stop_stream()
-                            stream.close()
-                            p.terminate()
-                            reply = utt.strip().split(None, 1)[0]
-			    if speakchoice:
-                                self.say( "Your answer is " + reply )
-	                    selection = self.mychoice(reply)
-                            if selection in arr:
-                                # Do the thing
-                                self.settings['myanswer'] = selection
-                                return selection
-                            elif selection == 'repeat':
-                                self.repeat()
-                            elif selection == 'stop':
-                                self.askstop()
-                            elif selection == 'help':
-                                self.help()
-                            elif selection == 'start':
-                                self.start()
-                            else:
-                                self.invalid()                            
-                            break
-            else:
-                break
-        decoder.end_utt()
     
     def score(self, point):
         global score
@@ -236,6 +167,28 @@ class LsttSkill(MycroftSkill):
             i = i + 1
             self.say(str(i) + ".    " + a)
         return
+
+    def runpocketsphinx(msg, arr)
+        local = LocalListener()
+        self.local.reset_decoder( None, self.settings.get('resdir')+'localstt.lm' , self.settings.get('resdir')+'localstt.dic', None):
+        self.say( msg )
+        rt = local.listen_once()
+        selection = self.mychoice(rt)
+        if selection in arr:
+            # Do the thing
+            self.settings['myanswer'] = selection
+            return selection
+        elif selection == 'repeat':
+            self.repeat()
+        elif selection == 'stop':
+            self.askstop()
+        elif selection == 'help':
+            self.help()
+        elif selection == 'start':
+            self.start()
+        else:
+            self.invalid()      
+
 
     def askquestion( self, category, quest, allanswers, correct_answer):
         i=0
@@ -289,23 +242,13 @@ class LsttSkill(MycroftSkill):
         self.endgame()
     
     def stop(self):
-        self.enclosure.activate_mouth_events()
-        self.enclosure.mouth_reset()
         self.enclosure.reset()    
-        command = 'service mycroft-speech-client start'.split()
-        command2 = 'service mycroft-speech-client start'.split()
-        p = Popen(['sudo', '-S'] + command, stdin=PIPE, stderr=PIPE, universal_newlines=True)
-        p = Popen(['sudo', '-S'] + command2, stdin=PIPE, stderr=PIPE, universal_newlines=True)
         LOGGER.info("Starting speech-client" )
         pass
 
     def handle_lstt_intent(self, message):
-        command = 'service mycroft-speech-client stop'.split()
-        command2 = 'service mycroft-audio stop'.split()
-        p = Popen(['sudo', '-S'] + command, stdin=PIPE, stderr=PIPE, universal_newlines=True)
-        p = Popen(['sudo', '-S'] + command2, stdin=PIPE, stderr=PIPE, universal_newlines=True)
         LOGGER.info("Stopping speech-client")
-	self.handle_trivia_intent()
+	self.handle_trivia_intent()        
 
 
 def create_skill():
