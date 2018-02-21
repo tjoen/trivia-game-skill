@@ -8,7 +8,6 @@ from mycroft.util import resolve_resource_file
 from mycroft.util.log import getLogger
 from subprocess import Popen, PIPE, check_output
 from HTMLParser import HTMLParser
-from websocket import create_connection
 import requests
 import json
 import random
