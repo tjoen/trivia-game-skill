@@ -14,6 +14,7 @@ import random
 import time
 
 # @JarbasAI local listener
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from localstt import *
 
 __author__ = 'tjoen'
