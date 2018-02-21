@@ -168,7 +168,7 @@ class LsttSkill(MycroftSkill):
             self.say(str(i) + ".    " + a)
         return
 
-    def runpocketsphinx(msg, arr)
+    def runpocketsphinx(msg, somefunc, arr):
         local = LocalListener()
         self.local.reset_decoder( None, self.settings.get('resdir')+'localstt.lm' , self.settings.get('resdir')+'localstt.dic', None):
         self.say( msg )
