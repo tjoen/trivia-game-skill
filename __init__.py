@@ -14,7 +14,7 @@ import random
 import time
 
 # @JarbasAI local listener
-from local-stt import *
+from localstt import *
 
 __author__ = 'tjoen'
 
