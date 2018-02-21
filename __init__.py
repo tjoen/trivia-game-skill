@@ -7,18 +7,13 @@ from mycroft.configuration import ConfigurationManager
 from mycroft.util import resolve_resource_file
 from mycroft.util.log import getLogger
 from subprocess import Popen, PIPE, check_output
-from ctypes import *
-from contextlib import contextmanager
-from os import environ, path
-from pocketsphinx.pocketsphinx import *
-from sphinxbase.sphinxbase import *
 from HTMLParser import HTMLParser
 from websocket import create_connection
 import requests
 import json
 import random
 import time
-import pyaudio
+
 
 __author__ = 'tjoen'
 
