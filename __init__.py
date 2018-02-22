@@ -250,7 +250,7 @@ class LsttSkill(MycroftSkill):
         self.say("Okay, lets play a game of trivia. Get ready!")
         for f in questions:
 	    if not end:
-            self.preparequestion( f['category'], f['question'], f['incorrect_answers'], f['correct_answer'])
+                self.preparequestion( f['category'], f['question'], f['incorrect_answers'], f['correct_answer'])
 	self.endgame()
     
     def stop(self):
