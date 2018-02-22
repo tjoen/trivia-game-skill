@@ -74,12 +74,12 @@ class LocalListener(object):
         if lm is None:
             lm = join(dirname(__file__), '/res/localstt.lm')
 
+        HOMEDIR = '/home/pi/'
         self.config = Decoder.default_config()
-        self.config.set_string('-hmm', hmm)
-        self.config.set_string('-lm', lm)
-        self.config.set_string('-dict', le_dict)
+        self.config.set_string('-hmm', '/usr/local/lib/python2.7/site-packages/mycroft_core-0.9.17-py2.7.egg/mycroft/client/speech/recognizer/model/en-us/hmm')
+        self.config.set_string('-lm', path.join(HOMEDIR, 'localstt.lm'))
+        self.config.set_string('-dict', path.join(HOMEDIR, 'localstt.dic'))            
         self.config.set_string('-logfn', '/dev/null')
-        print 'lm: ' + lm + 'hmm: ' + hmm + 'dict: ' + le_dict
         self.decoder = Decoder(self.config)
 
     def _one_listen(self):
