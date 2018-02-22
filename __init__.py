@@ -254,6 +254,8 @@ class LsttSkill(MycroftSkill):
 	self.endgame()
     
     def stop(self):
+        self.enclosure.activate_mouth_events()
+        self.enclosure.mouth_reset()
         self.enclosure.reset()    
         LOGGER.info("Starting speech-client" )
         pass
