@@ -111,7 +111,7 @@ class LsttSkill(MycroftSkill):
 	p.wait()
 
     def playsmpl(self, filename):
-        play_wav( str(filename))
+        play_wav( filename)
 
     def handle_record_begin(self):
         LOGGER.info("Lsst - Begin Recording...") 
