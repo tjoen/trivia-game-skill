@@ -94,6 +94,7 @@ class LocalListener(object):
                 if not in_speech_bf:
                     self.decoder.end_utt()
                     hypoteses = self.decoder.hyp()
+                    print 'Result:', self.decoder.hyp().hypstr
                     if hypoteses is not None:
                         utt = hypoteses.hypstr
                         if utt.strip() != '':
