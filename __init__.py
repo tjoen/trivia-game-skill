@@ -14,9 +14,13 @@ import json
 import random
 import time
 
-# @JarbasAI local listener
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from localstt import *
+
+from ctypes import *
+from contextlib import contextmanager
+from os import environ, path
+from pocketsphinx.pocketsphinx import *
+from sphinxbase.sphinxbase import *
+import pyaudio
 
 __author__ = 'tjoen'
 
@@ -170,27 +174,63 @@ class LsttSkill(MycroftSkill):
             self.say(str(i) + ".    " + a)
         return
 
-    def runpocketsphinx(self, msg, somefunc, arr):
-	local = LocalListener()
-   	self.say( msg )
-	self.handle_record_begin()
-	rt = local.listen_once()
-        selection = self.mychoice(rt)
-	self.handle_record_begin()
-        if selection in arr:
-            # Do the thing
-            self.settings['myanswer'] = selection
-            return selection
-        elif selection == 'repeat':
-            self.repeat()
-        elif selection == 'stop':
-            self.askstop()
-        elif selection == 'help':
-            self.help()
-        elif selection == 'start':
-            self.start()
-        else:
-            self.invalid()      
+    def runpocketsphinx(self, msg, speakchoice, arr):
+        self.enclosure.mouth_text( ' | '.join(arr) )
+        self.say(msg)
+        HOMEDIR = self.settings.get('resdir')
+        config = Decoder.default_config()
+        config.set_string('-hmm', self.settings.get('hmm'))
+        config.set_string('-lm', path.join(HOMEDIR, 'localstt.lm'))
+        config.set_string('-dict', path.join(HOMEDIR, 'localstt.dic'))
+        config.set_string('-logfn', '/dev/null')
+        decoder = Decoder(config)
+
+        with noalsaerr():
+            p = pyaudio.PyAudio()
+        stream = p.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=1024)
+        stream.start_stream()
+        self.handle_record_begin()
+      
+        in_speech_bf = False
+        decoder.start_utt()
+        while True:
+            buf = stream.read(1024)
+            if buf:
+                decoder.process_raw(buf, False, False)
+                if decoder.get_in_speech() != in_speech_bf:
+                    in_speech_bf = decoder.get_in_speech()
+                    if not in_speech_bf:
+                        decoder.end_utt()
+                        #print 'Result:', decoder.hyp().hypstr
+                        utt = decoder.hyp().hypstr
+                        decoder.start_utt()
+                        if utt.strip() != '':
+                            self.handle_record_end()
+                            stream.stop_stream()
+                            stream.close()
+                            p.terminate()
+                            reply = utt.strip().split(None, 1)[0]
+			    if speakchoice:
+                                self.say( "Your answer is " + reply )
+	                    selection = self.mychoice(reply)
+                            if selection in arr:
+                                # Do the thing
+                                self.settings['myanswer'] = selection
+                                return selection
+                            elif selection == 'repeat':
+                                self.repeat()
+                            elif selection == 'stop':
+                                self.askstop()
+                            elif selection == 'help':
+                                self.help()
+                            elif selection == 'start':
+                                self.start()
+                            else:
+                                self.invalid()                            
+                            break
+            else:
+                break
+        decoder.end_utt()     
 
 
     def askquestion( self, category, quest, allanswers, correct_answer):
