@@ -174,7 +174,7 @@ class LsttSkill(MycroftSkill):
 	local = LocalListener()
    	self.say( msg )
 	self.handle_record_begin()
-	rt = local.listen_numbers_once()
+	rt = local.listen_numbers_once(self.settings.get('resdir')+'localstt.dic')
         selection = self.mychoice(rt)
 	self.handle_record_begin()
         if selection in arr:
