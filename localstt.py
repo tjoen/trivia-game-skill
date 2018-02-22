@@ -79,6 +79,7 @@ class LocalListener(object):
         self.config.set_string('-lm', lm)
         self.config.set_string('-dict', le_dict)
         self.config.set_string('-logfn', '/dev/null')
+        print 'lm: ' + lm + 'hmm: ' + hmm + 'dict: ' + le_dict
         self.decoder = Decoder(self.config)
 
     def _one_listen(self):
