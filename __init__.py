@@ -231,7 +231,7 @@ class LsttSkill(MycroftSkill):
         self.settings['answers'] = None
         self.settings['myanswer'] = None
         self.settings['correct_answer'] = None
-        self.settings['resdir'] = '/opt/mycroft/skills/lstt-skill/res/'
+        self.settings['resdir'] = '/opt/mycroft/skills/trivia-game-skill/res/'
         # get mycroft location for hmm model
         cmd = 'pip show mycroft_core | grep Location'
         reply = check_output(cmd, shell=True) 
