@@ -256,11 +256,15 @@ class LsttSkill(MycroftSkill):
     def stop(self):
         self.enclosure.activate_mouth_events()
         self.enclosure.mouth_reset()
-        self.enclosure.reset()    
+        self.enclosure.reset()
+	command = 'service mycroft-speech-client start'.split()
+        p = Popen(['sudo', '-S'] + command, stdin=PIPE, stderr=PIPE, universal_newlines=True)
         LOGGER.info("Starting speech-client" )
         pass
 
     def handle_lstt_intent(self, message):
+        command = 'service mycroft-speech-client stop'.split()
+        p = Popen(['sudo', '-S'] + command, stdin=PIPE, stderr=PIPE, universal_newlines=True)
         LOGGER.info("Stopping speech-client")
 	self.handle_trivia_intent()        
 
