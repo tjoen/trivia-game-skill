@@ -77,8 +77,8 @@ class LocalListener(object):
         HOMEDIR = '/home/pi/'
         self.config = Decoder.default_config()
         self.config.set_string('-hmm', '/usr/local/lib/python2.7/site-packages/mycroft_core-0.9.17-py2.7.egg/mycroft/client/speech/recognizer/model/en-us/hmm')
-        self.config.set_string('-lm', path.join(HOMEDIR, 'localstt.lm'))
-        self.config.set_string('-dict', path.join(HOMEDIR, 'localstt.dic'))            
+        self.config.set_string('-lm', '/opt/mycroft/skills/trivia-game-skill/res/localstt.lm')
+        self.config.set_string('-dict', '/opt/mycroft/skills/trivia-game-skill/res/localstt.dic')            
         self.config.set_string('-logfn', '/dev/null')
         self.decoder = Decoder(self.config)
 
