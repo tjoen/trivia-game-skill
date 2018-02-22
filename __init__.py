@@ -172,7 +172,7 @@ class LsttSkill(MycroftSkill):
 
     def runpocketsphinx(self, msg, somefunc, arr):
 	local = LocalListener()
-        local.reset_decoder( None, self.settings.get('resdir')+'localstt.lm' , self.settings.get('resdir')+'localstt.dic')
+        local.self.reset_decoder( self.settings.get('resdir')+'localstt.lm' , self.settings.get('resdir')+'localstt.dic')
 	self.say( msg )
         rt = local.listen_once()
         selection = self.mychoice(rt)
