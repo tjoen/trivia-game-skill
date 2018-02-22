@@ -5,7 +5,7 @@ from mycroft.skills.core import MycroftSkill
 from mycroft.skills.core import intent_handler, intent_file_handler
 from adapt.intent import IntentBuilder
 from mycroft.configuration import ConfigurationManager
-from mycroft.util import resolve_resource_file
+from mycroft.util import resolve_resource_file, play_wav
 from mycroft.util.log import getLogger
 from subprocess import Popen, PIPE, check_output
 from HTMLParser import HTMLParser
@@ -111,8 +111,7 @@ class LsttSkill(MycroftSkill):
 	p.wait()
 
     def playsmpl(self, filename):
-        cmd = ['aplay', str(filename)]
-	p = Popen(cmd)
+        play_wav( str(filename))
 
     def handle_record_begin(self):
         LOGGER.info("Lsst - Begin Recording...") 
@@ -172,9 +171,9 @@ class LsttSkill(MycroftSkill):
         return
 
     def runpocketsphinx(self, msg, somefunc, arr):
-        reset_decoder( None, self.settings.get('resdir')+'localstt.lm' , self.settings.get('resdir')+'localstt.dic')
-	self.say( msg )
 	local = LocalListener()
+        local.reset_decoder( None, self.settings.get('resdir')+'localstt.lm' , self.settings.get('resdir')+'localstt.dic')
+	self.say( msg )
         rt = local.listen_once()
         selection = self.mychoice(rt)
         if selection in arr:
