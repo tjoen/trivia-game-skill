@@ -171,7 +171,7 @@ class LsttSkill(MycroftSkill):
         return
 
     def runpocketsphinx(self, msg, somefunc, arr):
-	local = LocalListener(self, self.settings.get('hmm') )
+	local = LocalListener()
    	self.say( msg )
 	self.handle_record_begin()
 	rt = local.listen_once()
