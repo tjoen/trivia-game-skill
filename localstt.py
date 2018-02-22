@@ -68,11 +68,11 @@ class LocalListener(object):
     def reset_decoder(self, hmm=None, lm=None, le_dict=None, lang=None):
         self.lang = lang or self.lang
         if le_dict is None:
-            le_dict = join(dirname(__file__), lang, 'basic.dic')
+            le_dict = join(dirname(__file__), '/res/localstt.dic')
         if hmm is None:
             hmm = join(dirname(__file__), lang, 'hmm')
         if lm is None:
-            lm = join(dirname(__file__), lang, 'localstt.lm')
+            lm = join(dirname(__file__), '/res/localstt.lm')
 
         self.config = Decoder.default_config()
         self.config.set_string('-hmm', hmm)
