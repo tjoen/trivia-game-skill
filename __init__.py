@@ -263,8 +263,8 @@ class LsttSkill(MycroftSkill):
         pass
 
     def handle_lstt_intent(self, message):
-        command = 'service mycroft-speech-client stop'.split()
-        p = Popen(['sudo', '-S'] + command, stdin=PIPE, stderr=PIPE, universal_newlines=True)
+        #command = 'service mycroft-speech-client stop'.split()
+        #p = Popen(['sudo', '-S'] + command, stdin=PIPE, stderr=PIPE, universal_newlines=True)
         LOGGER.info("Stopping speech-client")
 	self.handle_trivia_intent()        
 
