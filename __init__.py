@@ -28,7 +28,8 @@ score = 0
 right = ['Right!', 'That is correct', 'Yes, you are right', 'That is the right answer', 'Yes, good answer', 'Excellent choice']
 wrong = ['That is incorrect', 'Wrong answer', 'Sorry, you are wrong', 'That is not the right answer', 'You are wrong']
 config = ConfigurationManager.get()
-
+end = False
+restart = False
 
 class LsttSkill(MycroftSkill):
     def __init__(self):
@@ -52,6 +53,8 @@ class LsttSkill(MycroftSkill):
     def askstop(self):
 	response = self.runpocketsphinx("Would you like to stop?", False, yesno)
 	if response == 'yes':
+            global end
+            end = True
 	    self.endgame()
 	else:
 	    self.runpocketsphinx("Choose 1,2,3 or 4", False, validmc)
@@ -64,6 +67,10 @@ class LsttSkill(MycroftSkill):
 	response = self.runpocketsphinx("Would you like to restart?", False, yesno)
 	if response == 'yes':
 	    self.handle_trivia_intent()
+            global end
+            end = True
+            global restart
+            restart = True
 	else:
 	    self.runpocketsphinx("Choose 1,2,3 or 4", False, validmc)
 
@@ -195,19 +202,27 @@ class LsttSkill(MycroftSkill):
             self.say(str(i) + ".    " + a)
         self.runpocketsphinx("Choose 1,2,3 or 4.", False, validmc)
         response2 = self.settings.get('myanswer')
-        self.say("Your answer is "+ str(response2))
-        if correct_answer == allanswers[int(response2)-1]:
-            self.right()
-        else:
-            self.wrong(correct_answer)
+	if not end:
+            self.say("Your answer is "+ str(response2))
+            if correct_answer == allanswers[int(response2)-1]:
+                self.right()
+            else:
+                self.wrong(correct_answer)
         return 
 
     def endgame(self):
-        self.enclosure.mouth_text( "SCORE: "+str(score) )
-        self.say("You answered " +str(score)+ " questions correct")
-        self.say("Thanks for playing!")
-        self.playsmpl( self.settings.get('resdir')+'end.wav' )
-        self.stop()
+	if restart:
+            global score
+            score = 0
+            self.handle_trivia_intent()
+        else:
+            self.enclosure.mouth_text( "SCORE: "+str(score) )
+            self.say("You answered " +str(score)+ " questions correct")
+            self.say("Thanks for playing!")
+	    global end
+	    end = False
+            self.playsmpl( self.settings.get('resdir')+'end.wav' )
+            self.stop()
     
     def handle_trivia_intent(self):
         self.enclosure.deactivate_mouth_events()
@@ -234,8 +249,9 @@ class LsttSkill(MycroftSkill):
         self.playsmpl( self.settings.get('resdir')+'intro.wav' )
         self.say("Okay, lets play a game of trivia. Get ready!")
         for f in questions:
+	    if not end:
             self.preparequestion( f['category'], f['question'], f['incorrect_answers'], f['correct_answer'])
-        self.endgame()
+	self.endgame()
     
     def stop(self):
         self.enclosure.reset()    
