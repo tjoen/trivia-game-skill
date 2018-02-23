@@ -24,7 +24,7 @@ Working features:
 - great speed improvement on speech results.
 
 ## Known issues:
-Should really be using @JArbasAI local-listener, but I did not get it to work yet.
+Master version is using @JArbasAI local-listener, seems to work, using a dict with numbers.
 
 ## Examples 
 * "Hey Mycroft, start local speech"
