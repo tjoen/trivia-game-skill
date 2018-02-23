@@ -20,11 +20,11 @@ Translations might be a problem with this method, but this skill uses questions 
 
 ## Current state
 Working features:
-- Version seems to work fine, the skill disables the speechclient and audio service during the skill
+- Version seems to work fine, the skill uses naptime during the skill
 - great speed improvement on speech results.
 
 ## Known issues:
-Could probably be much more efficient, and much cleaner.
+Should really be using @JArbasAI local-listener, but I did not get it to work yet.
 
 ## Examples 
 * "Hey Mycroft, start local speech"
