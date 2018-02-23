@@ -34,6 +34,7 @@ Could probably be much more efficient, and much cleaner.
 ## Credits 
 Theun Kohlbeck, https://github.com/tjoen
 Steen Bentall, https://github.com/barricados
+JarbasAI, https://github.com/jarbasai 
 
 ## Require 
 platform_mark1 platform_picroft platform_plasmoid 
