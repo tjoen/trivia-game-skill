@@ -24,6 +24,7 @@ import pyaudio
 from websocket import create_connection
 
 __author__ = 'tjoen'
+__version__ = "0.1"
 
 LOGGER = getLogger(__name__)
 
