@@ -73,7 +73,7 @@ class LsttSkill(MycroftSkill):
 	if response == 'yes':
             global end
             end = True
-	    self.endgame()
+            return
 	else:
 	    self.runpocketsphinx("Choose 1,2,3 or 4", False, validmc)
 	
@@ -89,6 +89,7 @@ class LsttSkill(MycroftSkill):
             end = True
             global restart
             restart = True
+	    return
 	else:
 	    self.runpocketsphinx("Choose 1,2,3 or 4", False, validmc)
 
@@ -268,6 +269,10 @@ class LsttSkill(MycroftSkill):
 	if restart:
             global score
             score = 0
+	    global end
+	    end = False
+	    global restart
+	    restart = False
             self.handle_trivia_intent()
         else:
             self.enclosure.mouth_text( "SCORE: "+str(score) )
