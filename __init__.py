@@ -146,11 +146,11 @@ class LsttSkill(MycroftSkill):
                 config.get('sounds').get('start_listening'))
             if file:
                 self.playsmpl(file)
-       self.wsnotify('recognizer_loop:record_begin')
+        self.wsnotify('recognizer_loop:record_begin')
 
     def handle_record_end(self):
         LOGGER.info("Lsst - End Recording...")
-       self.wsnotify('recognizer_loop:record_end')
+        self.wsnotify('recognizer_loop:record_end')
     
     def score(self, point):
         global score
