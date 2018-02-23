@@ -13,6 +13,7 @@ import requests
 import json
 import random
 import time
+from websocket import create_connection
 
 # @JarbasAI local listener
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -257,20 +258,34 @@ class LsttSkill(MycroftSkill):
 	    if not end:
                 self.preparequestion( f['category'], f['question'], f['incorrect_answers'], f['correct_answer'])
 	self.endgame()
+
+    def wsnotify(self, msg):
+        uri = 'ws://localhost:8181/core'
+        ws = create_connection(uri)
+        print "Sending " + msg + " to " + uri + "..."
+        data = "{}"
+        message = '{"type": "' + msg + '", "data": ' + data +'}'
+        result = ws.send(message)
+        print "Receiving..."
+        result =  ws.recv()
+        print "Received '%s'" % result
+        ws.close()
     
     def stop(self):
         self.enclosure.activate_mouth_events()
         self.enclosure.mouth_reset()
         self.enclosure.reset()
-	command = 'service mycroft-speech-client start'.split()
-        p = Popen(['sudo', '-S'] + command, stdin=PIPE, stderr=PIPE, universal_newlines=True)
-        LOGGER.info("Starting speech-client" )
+	#command = 'service mycroft-speech-client start'.split()
+        #p = Popen(['sudo', '-S'] + command, stdin=PIPE, stderr=PIPE, universal_newlines=True)
+        self.wsnotify('recognizer_loop:wake_up')
+        LOGGER.info("Wake up!" )
         pass
 
     def handle_lstt_intent(self, message):
         #command = 'service mycroft-speech-client stop'.split()
         #p = Popen(['sudo', '-S'] + command, stdin=PIPE, stderr=PIPE, universal_newlines=True)
-        LOGGER.info("Stopping speech-client")
+        self.wsnotify('recognizer_loop:sleep')
+        LOGGER.info("Start naptime")
 	self.handle_trivia_intent()        
 
 
