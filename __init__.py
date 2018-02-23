@@ -14,13 +14,14 @@ import json
 import random
 import time
 
-
+# used for pocketsphinx
 from ctypes import *
 from contextlib import contextmanager
 from os import environ, path
 from pocketsphinx.pocketsphinx import *
 from sphinxbase.sphinxbase import *
 import pyaudio
+from websocket import create_connection
 
 __author__ = 'tjoen'
 
@@ -124,13 +125,17 @@ class LsttSkill(MycroftSkill):
             return 'invalid'
 
     def say(self, text):
+        self.wsnotify('recognizer_loop:audio_output_start')
         cmd = ['mimic','--setf','int_f0_target_mean=107','--setf' 'duration_stretch=0.83','-t']
         cmd.append(text)
         p = Popen(cmd)
 	p.wait()
+        self.wsnotify('recognizer_loop:audio_output_end')
 
     def playsmpl(self, filename):
+        self.wsnotify('recognizer_loop:audio_output_start')
         play_wav( filename)
+        self.wsnotify('recognizer_loop:audio_output_end')
 
     def handle_record_begin(self):
         LOGGER.info("Lsst - Begin Recording...") 
@@ -141,9 +146,11 @@ class LsttSkill(MycroftSkill):
                 config.get('sounds').get('start_listening'))
             if file:
                 self.playsmpl(file)
+       self.wsnotify('recognizer_loop:record_begin')
 
     def handle_record_end(self):
         LOGGER.info("Lsst - End Recording...")
+       self.wsnotify('recognizer_loop:record_end')
     
     def score(self, point):
         global score
@@ -188,6 +195,18 @@ class LsttSkill(MycroftSkill):
             i = i + 1
             self.say(str(i) + ".    " + a)
         return
+
+    def wsnotify(self, msg):
+        uri = 'ws://localhost:8181/core'
+        ws = create_connection(uri)
+        print "Sending " + msg + " to " + uri + "..."
+        data = "{}"
+        message = '{"type": "' + msg + '", "data": ' + data +'}'
+        result = ws.send(message)
+        print "Receiving..."
+        result =  ws.recv()
+        print "Received '%s'" % result
+        ws.close()
 
     def runpocketsphinx(self, msg, speakchoice, arr):
         self.enclosure.mouth_text( ' | '.join(arr) )
@@ -316,15 +335,17 @@ class LsttSkill(MycroftSkill):
         self.enclosure.activate_mouth_events()
         self.enclosure.mouth_reset()
         self.enclosure.reset()
-	command = 'service mycroft-speech-client start'.split()
-        p = Popen(['sudo', '-S'] + command, stdin=PIPE, stderr=PIPE, universal_newlines=True)
-        LOGGER.info("Starting speech-client" )
+	#command = 'service mycroft-speech-client start'.split()
+        #p = Popen(['sudo', '-S'] + command, stdin=PIPE, stderr=PIPE, universal_newlines=True)
+        LOGGER.info("Awaken speech-client" )
+        self.wsnotify('recognizer_loop:wake_up')
         pass
 
     def handle_lstt_intent(self, message):
         #command = 'service mycroft-speech-client stop'.split()
         #p = Popen(['sudo', '-S'] + command, stdin=PIPE, stderr=PIPE, universal_newlines=True)
-        LOGGER.info("Stopping speech-client")
+        LOGGER.info("Send speech-client to sleep")
+        self.wsnotify('recognizer_loop:sleep')
 	self.handle_trivia_intent()        
 
 
